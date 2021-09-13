@@ -9,10 +9,10 @@
 #' @export
 #'
 #' @examples
-data_import <- function(dir_data) {
+data_import <- function(dir_data, d = "\t") {
 
   files <- list.files(dir_data, recursive = TRUE,
-                      full.names = TRUE)
+                      full.names = TRUE, pattern = "*.txt")
 
   luminex_list <- list()
 
@@ -33,11 +33,12 @@ data_import <- function(dir_data) {
       "FI...Bkgd")
 
   for (i in 1:length(files)) {
-    #  for(i in 1:2){
+     # for(i in 1:2){
     plate <-
       read.delim(files[i],
                  stringsAsFactors = FALSE,
-                 strip.white = TRUE)
+                 strip.white = TRUE,
+                 sep = d)
 
     line_first <- unlist(names(plate))  # what happens when it doesn't have names?
     files_invalid$line_first[i] <-
@@ -75,10 +76,8 @@ data_import <- function(dir_data) {
                                    line_first == FALSE |
                                    header_repeat == FALSE)
   readr::write_rds(files_invalid, "rds/files_invalid.rds")
-
+  luminex_list <- luminex_list[luminex_list != "invalid"]
   dta <- dplyr::bind_rows(luminex_list)
   #readr::write_rds(dta, "rds/dta.rds")
 }
-
-
 
